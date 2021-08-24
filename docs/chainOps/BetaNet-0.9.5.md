@@ -49,7 +49,7 @@ export CLUSTER_NAME=<cluster_name>
 export KUBECONFIG=../.live/${CLUSTER_NAME}/kubeconfig_${CLUSTER_NAME}
 
 helm upgrade sifnode ./helm/standalone/sifnode \
---install -n sifnode-api --create-namespace \
+--install -n sifnode --create-namespace \
 --set sifnode.args.upgrade.fix="true" \
 --set sifnode.args.upgrade.version="0.9.5" \
 --set sifnode.args.upgrade.height=2976500 \
