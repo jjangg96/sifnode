@@ -1,65 +1,72 @@
-import { container } from "tsyringe";
 import { HardhatNodeRunner } from "../src/devenv/hardhatNode";
-import { GolangBuilder, GolangResultsPromise } from "../src/devenv/golangBuilder";
-import { SifnodedRunner } from "../src/devenv/sifnoded";
-import { SmartContractDeployer, SmartContractDeployResult } from "../src/devenv/smartcontractDeployer";
-import { cons } from "fp-ts/lib/ReadonlyNonEmptyArray";
-import { sampleCode } from "../src/devenv/synchronousCommand";
-import { EbrelayerArguments, EbrelayerRunner } from "../src/devenv/ebrelayer";
-
+import { GolangBuilder, GolangResults } from "../src/devenv/golangBuilder";
+import { SifnodedRunner, ValidatorValues } from "../src/devenv/sifnoded";
+import { DeployedContractAddresses } from "../scripts/deploy_contracts";
+import { SmartContractDeployer } from "../src/devenv/smartcontractDeployer";
+import { EbrelayerRunner } from "../src/devenv/ebrelayer";
 
 async function startHardhat() {
-  const node = container.resolve(HardhatNodeRunner)
+  const node = new HardhatNodeRunner()
   const [process, resultsPromise] = node.go()
   const results = await resultsPromise
   console.log(`rsltis: ${JSON.stringify(results, undefined, 2)}`)
-  return process
+  return { process }
 }
 
 async function golangBuilder() {
-  const node = container.resolve(GolangBuilder)
+  const node = new GolangBuilder()
   const [process, resultsPromise] = node.go()
-  let golangResultsPromise = new GolangResultsPromise(resultsPromise);
-  container.register(GolangResultsPromise, { useValue: golangResultsPromise })
-  const sifnodeTask = sifnodedBuilder(golangResultsPromise)
   const results = await resultsPromise
   console.log(`golangBuilder: ${JSON.stringify(results, undefined, 2)}`)
-  return Promise.all([process, sifnodeTask])
+  const output = await Promise.all([process, results])
+  return {
+    process: output[0],
+    results: output[1]
+  }
 }
 
-async function sifnodedBuilder(golangResults: GolangResultsPromise) {
+async function sifnodedBuilder(golangResults: GolangResults) {
   console.log('in sifnodedBuilder')
-  const node = container.resolve(SifnodedRunner)
+  const node = new SifnodedRunner(
+    golangResults
+  )
   const [process, resultsPromise] = node.go()
   const results = await resultsPromise
   console.log(`golangBuilder: ${JSON.stringify(results, undefined, 2)}`)
-  return process
+  return {
+    process,
+    results
+  }
 }
 
 async function smartContractDeployer() {
-  const node: SmartContractDeployer = container.resolve(SmartContractDeployer);
+  const node: SmartContractDeployer = new SmartContractDeployer();
   const [process, resultsPromise] = node.go();
   const result = await resultsPromise;
-  container.register(SmartContractDeployResult, { useValue: result })
   console.log(`Contracts deployed: ${JSON.stringify(result.contractAddresses, undefined, 2)}`)
-  await ebrelayerBuilder()
-  return;
+  return { process, result };
 }
 
-async function ebrelayerBuilder() {
-  const node: EbrelayerRunner = container.resolve(EbrelayerRunner);
+async function ebrelayerBuilder(contractAddresses: DeployedContractAddresses, validater: ValidatorValues) {
+  const node: EbrelayerRunner = new EbrelayerRunner({
+    smartContract: contractAddresses,
+    validatorValues: validater,
+  });
   const [process, resultsPromise] = node.go();
   const result = await resultsPromise;
-  return process;
+  return { process, result };
 }
 
 async function main() {
-  await Promise.all([startHardhat(), golangBuilder()])
-    .then(smartContractDeployer)
-    .then(() => {
-      console.log("Congrats, you did not fail, yay!")
-    })
-    .catch((e) => { console.log("Deployment failed. Lets log where it broke: ", e) });
+  try {
+    const golang = (await Promise.all([startHardhat(), golangBuilder()]))[1]
+    const sifnode = await sifnodedBuilder(golang.results);
+    const smartcontract = await smartContractDeployer()
+    await ebrelayerBuilder(smartcontract.result.contractAddresses, sifnode.results.validatorValues[0])
+    console.log("Congrats, you did not fail, yay!")
+  } catch (error) {
+    console.log("Deployment failed. Lets log where it broke: ", error);
+  }
 }
 
 main()
