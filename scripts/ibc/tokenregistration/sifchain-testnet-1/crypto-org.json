@@ -2,12 +2,12 @@
   "entries": [
     {
       "is_whitelisted": true,
-      "decimals": "6",
-      "denom": "basecro",
+      "decimals": "8",
+      "denom": "ibc/1037D0483A4AF3316DE9BB2C3542DF049AC8E4306B1C337F57005A8518B72D96",
       "base_denom": "basecro",
-      "path": "",
-      "ibc_channel_id": "",
-      "ibc_counterparty_channel_id": "",
+      "path": "transfer/channel-7",
+      "ibc_channel_id": "channel-7",
+      "ibc_counterparty_channel_id": "channel-19",
       "display_name": "CRO",
       "display_symbol": "",
       "network": "",
@@ -21,7 +21,7 @@
       ],
       "unit_denom": "",
       "ibc_counterparty_denom": "",
-      "ibc_counterparty_chain_id": ""
+      "ibc_counterparty_chain_id": "crypto-org-chain-mainnet-1"
     }
   ]
 }

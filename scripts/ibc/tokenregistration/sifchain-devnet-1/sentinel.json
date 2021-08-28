@@ -7,7 +7,7 @@
       "base_denom": "udvpn",
       "path": "transfer/channel-111",
       "ibc_channel_id": "channel-111",
-      "ibc_counterparty_channel_id": "CHANNEL-35",
+      "ibc_counterparty_channel_id": "channel-35",
       "display_name": "uDVPN",
       "display_symbol": "",
       "network": "",

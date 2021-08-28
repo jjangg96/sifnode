@@ -18,5 +18,5 @@ SIFCHAIN_ID=sifchain-devnet-1 \
   CRYPTO_ORG_COUNTERPARTY_CHANNEL_ID=channel-31 \
   CRYPTO_ORG_CHAIN_ID=crypto-org-chain-mainnet-1 \
   SENTINEL_CHANNEL_ID=channel-111 \
-  SENTINEL_COUNTERPARTY_CHANNEL_ID=CHANNEL-35 \
+  SENTINEL_COUNTERPARTY_CHANNEL_ID=channel-35 \
   SENTINEL_CHAIN_ID=sentinelhub-2 ./template/generate-all-ibc.sh
