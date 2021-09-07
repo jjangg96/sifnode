@@ -36,6 +36,20 @@ func (m *MockKeeper) EXPECT() *MockKeeperMockRecorder {
 	return m.recorder
 }
 
+// CheckDenomPermissions mocks base method.
+func (m *MockKeeper) CheckDenomPermissions(ctx types0.Context, denom string, permissions []types.Permission) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckDenomPermissions", ctx, denom, permissions)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// CheckDenomPermissions indicates an expected call of CheckDenomPermissions.
+func (mr *MockKeeperMockRecorder) CheckDenomPermissions(ctx, denom, permissions interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckDenomPermissions", reflect.TypeOf((*MockKeeper)(nil).CheckDenomPermissions), ctx, denom, permissions)
+}
+
 // ExportGenesis mocks base method.
 func (m *MockKeeper) ExportGenesis(ctx types0.Context) *types.GenesisState {
 	m.ctrl.T.Helper()
